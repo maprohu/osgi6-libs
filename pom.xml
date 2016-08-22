@@ -192,10 +192,10 @@
         <!--<module>multi-bundle</module>-->
         <module>multi</module>
         <module>multi-api</module>
-        <module>strict</module>
+        <!--<module>strict</module>-->
         <module>actor</module>
         <module>akka-http</module>
-        <module>akka-http-strict</module>
+        <!--<module>akka-http-strict</module>-->
         <module>akka-http-multi</module>
         <module>akka-stream</module>
         <module>akka-stream-jms</module>
