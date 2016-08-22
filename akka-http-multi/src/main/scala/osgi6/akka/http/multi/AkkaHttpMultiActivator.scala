@@ -6,14 +6,11 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
 import akka.stream.{ActorMaterializer, Materializer}
 import com.typesafe.config.{Config, ConfigFactory}
-import org.osgi.framework.BundleContext
-import osgi6.actor.ActorSystemActivator
 import osgi6.akka.stream.AkkaStreamActivator
 import osgi6.common.{AsyncActivator, BaseActivator}
 import osgi6.lib.multi.MultiApiActivator
-import osgi6.multi.api.MultiApi
+import osgi6.multi.api.MultiApiTrait
 
-import scala.concurrent.ExecutionContext
 
 /**
   * Created by pappmar on 05/07/2016.
@@ -21,6 +18,7 @@ import scala.concurrent.ExecutionContext
 import osgi6.akka.http.multi.AkkaHttpMultiActivator._
 
 class AkkaHttpMultiActivator(
+  registry: MultiApiTrait.Registry,
   starter: Start,
   filter: HttpServletRequest => Boolean = _ => true,
   classLoader: Option[ClassLoader] = None,
@@ -30,6 +28,7 @@ class AkkaHttpMultiActivator(
     import ctx._
 
     AkkaHttpMultiActivator.activate(
+      registry,
       starter(ctx),
       filter
     )
@@ -46,6 +45,7 @@ object AkkaHttpMultiActivator {
   type Start = Input => Run
 
   def activate(
+    registry: MultiApiTrait.Registry,
     run: Run,
     filter: HttpServletRequest => Boolean = _ => true
   )(implicit
@@ -58,6 +58,7 @@ object AkkaHttpMultiActivator {
 
     AsyncActivator.stops(
       MultiApiActivator.activate(
+        registry,
         AkkaHttpMultiApiHandler(route, filter)
       ),
       routeStop

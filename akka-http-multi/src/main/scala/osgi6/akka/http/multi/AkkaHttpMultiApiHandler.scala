@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.Materializer
 import osgi6.akka.http.multi.AkkaHttpServlet.RequestProcessor
 import osgi6.common.AsyncActivator
-import osgi6.multi.api.MultiApi
+import osgi6.multi.api.{MultiApiTrait}
 
 import scala.concurrent.ExecutionContext
 
@@ -22,7 +22,7 @@ object AkkaHttpMultiApiHandler {
   )(implicit
     actorSystem: ActorSystem,
     materializer: Materializer
-  ) : (MultiApi.Handler, AsyncActivator.Stop) = {
+  ) : (MultiApiTrait.Handler, AsyncActivator.Stop) = {
     import actorSystem.dispatcher
 
     val (processor, cancel) = AkkaHttpServlet.processor(route, filter)
@@ -36,8 +36,8 @@ object AkkaHttpMultiApiHandler {
 
   class Handler(val processor: RequestProcessor)(implicit
     executionContext: ExecutionContext
-  ) extends MultiApi.Handler {
-    override def dispatch(request: HttpServletRequest, response: HttpServletResponse, callback: MultiApi.Callback): Unit = {
+  ) extends MultiApiTrait.Handler {
+    override def dispatch(request: HttpServletRequest, response: HttpServletResponse, callback: MultiApiTrait.Callback): Unit = {
       processor.process(request, response)
         .foreach(callback.handled)
     }

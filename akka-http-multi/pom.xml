@@ -31,7 +31,7 @@
         <!--</dependency>-->
         <dependency>
             <groupId>osgi6</groupId>
-            <artifactId>osgi6-multi-api</artifactId>
+            <artifactId>osgi6-lib-multi-api</artifactId>
             <version>1.0.10-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>

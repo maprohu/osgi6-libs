@@ -1,10 +1,8 @@
 package osgi6.lib.multi
 
 import maprohu.scalaext.common.{Cancel, Stateful}
-import org.osgi.framework.BundleContext
 import osgi6.common.AsyncActivator
-import osgi6.multi.api.{Context, ContextApi}
-import osgi6.multi.api.ContextApi.Handler
+import osgi6.multi.api.{Context,  ContextApiTrait}
 
 import scala.concurrent.ExecutionContext
 
@@ -28,11 +26,13 @@ object ContextApiActivator {
   ) extends HasApiContext
 
   def activateNonNull(
+    registry: ContextApiTrait.Registry,
     starter: Context => AsyncActivator.Stop
   )(implicit
     executionContext: ExecutionContext
   ) = {
     activate(
+      registry,
       { hasCtx =>
         hasCtx.apiContext.map({ apiCtx =>
           starter(apiCtx)
@@ -44,13 +44,14 @@ object ContextApiActivator {
   }
 
   def activate(
+    registry: ContextApiTrait.Registry,
     starter: Start
   )(implicit
     executionContext: ExecutionContext
   ) = {
     val cancel = Stateful.cancels
 
-    val reg = ContextApi.registry.listen(new Handler {
+    val reg = registry.listen(new ContextApiTrait.Handler {
       override def dispatch(apiCtx: Context): Unit = {
         cancel.add({ () =>
           Cancel(

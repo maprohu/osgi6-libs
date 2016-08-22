@@ -191,6 +191,7 @@
         <!--<module>multi-api</module>-->
         <!--<module>multi-bundle</module>-->
         <module>multi</module>
+        <module>multi-api</module>
         <module>strict</module>
         <module>actor</module>
         <module>akka-http</module>

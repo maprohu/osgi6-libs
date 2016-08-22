@@ -5,7 +5,7 @@ import javax.servlet.ServletConfig
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import osgi6.common.HttpTools
-import osgi6.multi.api.{Context, MultiApi}
+import osgi6.multi.api.{Context,  MultiApiTrait}
 
 import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.duration._
@@ -16,18 +16,18 @@ import scala.util.Try
   */
 object MultiProcessor {
 
-  def process(request: HttpServletRequest, response: HttpServletResponse): Future[Boolean] = {
+  def process(registry: MultiApiTrait.Registry, request: HttpServletRequest, response: HttpServletResponse): Future[Boolean] = {
     import scala.collection.JavaConversions._
 
     val promise = Promise[Boolean]()
 
-    val handlers: Iterator[MultiApi.Handler] = MultiApi.registry.iterate
+    val handlers: Iterator[MultiApiTrait.Handler] = registry.iterate
 
     def processNext : Unit = {
       if (handlers.hasNext) {
         val handler = handlers.next()
 
-        handler.dispatch(request, response, new MultiApi.Callback {
+        handler.dispatch(request, response, new MultiApiTrait.Callback {
           override def handled(result: Boolean): Unit = {
             if (result) {
               promise.success(true)
@@ -49,11 +49,11 @@ object MultiProcessor {
 
   }
 
-  def processSync(request: HttpServletRequest, response: HttpServletResponse) = {
+  def processSync(registry: MultiApiTrait.Registry, request: HttpServletRequest, response: HttpServletResponse) = {
     HttpTools.preResponse(request, response)
 
     val processed = Await.result(
-      MultiProcessor.process(request, response),
+      MultiProcessor.process(registry, request, response),
       1.minute
     )
 

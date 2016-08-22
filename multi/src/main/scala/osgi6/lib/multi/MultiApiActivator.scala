@@ -4,28 +4,29 @@ import javax.servlet.http.HttpServletRequest
 
 import org.osgi.framework.BundleContext
 import osgi6.common.{AsyncActivator, HasBundleContext}
-import osgi6.multi.api.{Context, MultiApi}
+import osgi6.multi.api.{Context, MultiApiTrait}
 
 /**
   * Created by pappmar on 05/07/2016.
   */
 import osgi6.lib.multi.MultiApiActivator._
 
-class MultiApiActivator(starter: Start) extends AsyncActivator({ ctx =>
-  activate(starter(ctx))
+class MultiApiActivator(registry: MultiApiTrait.Registry, starter: Start) extends AsyncActivator({ ctx =>
+  activate(registry, starter(ctx))
 })
 
 object MultiApiActivator {
 
   type Start = HasBundleContext => Run
-  type Run = (MultiApi.Handler, AsyncActivator.Stop)
+  type Run = (MultiApiTrait.Handler, AsyncActivator.Stop)
 
   def activate(
+    registry: MultiApiTrait.Registry,
     run: Run
   ) : AsyncActivator.Stop = {
     val (handler, stop) = run
 
-    val reg = MultiApi.registry.register(handler)
+    val reg = registry.register(handler)
 
     { () =>
       reg.remove
