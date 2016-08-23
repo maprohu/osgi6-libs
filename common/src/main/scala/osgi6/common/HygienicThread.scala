@@ -12,7 +12,7 @@ import scala.util.Try
 object HygienicThread {
 
 
-  def execute[T]( task: => T, timeout: Duration = 10.minutes ) : T = {
+  def execute[T]( task: => T, timeout: Duration = 10.minutes, classLoader: Option[ClassLoader] = None ) : T = {
     val promise = Promise[T]()
     val thread = new Thread() {
       override def run(): Unit = {
@@ -21,11 +21,13 @@ object HygienicThread {
         } catch {
           case ex : Throwable =>
             promise.failure(ex)
-
         }
       }
     }
     thread.setName("hygienic-" + Thread.currentThread().getName)
+    classLoader.foreach({ cl =>
+      thread.setContextClassLoader(cl)
+    })
     thread.start()
     Await.result(promise.future, timeout)
   }
