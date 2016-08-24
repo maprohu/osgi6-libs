@@ -64,7 +64,12 @@ public class ParentLastURLClassLoader extends ClassLoader
 
     public ParentLastURLClassLoader(List<URL> classpath)
     {
-        super(Thread.currentThread().getContextClassLoader());
+        this(classpath, Thread.currentThread().getContextClassLoader());
+    }
+
+    public ParentLastURLClassLoader(List<URL> classpath, ClassLoader parent)
+    {
+        super(parent);
 
         URL[] urls = classpath.toArray(new URL[classpath.size()]);
 
