@@ -29,9 +29,11 @@ object AkkaHttpServlet {
 
     val dataSource = IOStreams.source(() => req.getInputStream)
 
+    val requestURI = req.getRequestURI.replaceAll("/+", "/")
+
     HttpRequest(
       method = HttpMethods.getForKey(req.getMethod).get,
-      uri = Uri(req.getRequestURI).copy(rawQueryString = Option(req.getQueryString)),
+      uri = Uri(requestURI).copy(rawQueryString = Option(req.getQueryString)),
       headers = req.getHeaderNames.asInstanceOf[java.util.Enumeration[String]].toIterable.map({ headerName =>
         HttpHeader.parse(headerName, req.getHeader(headerName)).asInstanceOf[Ok].header
       })(collection.breakOut),
