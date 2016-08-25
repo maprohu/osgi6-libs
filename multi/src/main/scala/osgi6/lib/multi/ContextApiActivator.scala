@@ -25,23 +25,23 @@ object ContextApiActivator {
     apiContext: Option[Context]
   ) extends HasApiContext
 
-  def activateNonNull(
-    registry: ContextApiTrait.Registry,
-    starter: Context => AsyncActivator.Stop
-  )(implicit
-    executionContext: ExecutionContext
-  ) = {
-    activate(
-      registry,
-      { hasCtx =>
-        hasCtx.apiContext.map({ apiCtx =>
-          starter(apiCtx)
-        }).getOrElse(
-          AsyncActivator.Noop
-        )
-      }
-    )
-  }
+//  def activateNonNull(
+//    registry: ContextApiTrait.Registry,
+//    starter: Context => AsyncActivator.Stop
+//  )(implicit
+//    executionContext: ExecutionContext
+//  ) = {
+//    activate(
+//      registry,
+//      { hasCtx =>
+//        hasCtx.apiContext.map({ apiCtx =>
+//          starter(apiCtx)
+//        }).getOrElse(
+//          AsyncActivator.Noop
+//        )
+//      }
+//    )
+//  }
 
   def activate(
     registry: ContextApiTrait.Registry,

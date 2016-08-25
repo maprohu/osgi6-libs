@@ -4,8 +4,9 @@ import java.io.File
 import javax.servlet.ServletConfig
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
+import org.slf4j.LoggerFactory
 import osgi6.common.HttpTools
-import osgi6.multi.api.{Context,  MultiApiTrait}
+import osgi6.multi.api.{Context, MultiApiTrait}
 
 import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.duration._
@@ -15,6 +16,8 @@ import scala.util.Try
   * Created by martonpapp on 12/07/16.
   */
 object MultiProcessor {
+
+  val LOG = LoggerFactory.getLogger(MultiProcessor.getClass)
 
   def process(registry: MultiApiTrait.Registry, request: HttpServletRequest, response: HttpServletResponse): Future[Boolean] = {
     import scala.collection.JavaConversions._
@@ -52,19 +55,29 @@ object MultiProcessor {
   def processSync(registry: MultiApiTrait.Registry, request: HttpServletRequest, response: HttpServletResponse) = {
     HttpTools.preResponse(request, response)
 
-    val processed = Await.result(
-      MultiProcessor.process(registry, request, response),
-      1.minute
-    )
+    try {
+      val processed = Await.result(
+        MultiProcessor.process(registry, request, response),
+        1.minute
+      )
 
-    if (!processed) {
-      response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+      if (!processed) {
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND)
+      }
+
+    } catch {
+      case ex : Throwable =>
+        LOG.error("error procesing request", ex)
+
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+        response.getOutputStream.write("ERROR".getBytes())
     }
 
     Try(while (request.getInputStream.read() != -1) {})
     request.getInputStream.close()
     response.getOutputStream.flush()
     response.getOutputStream.close()
+
   }
 
 

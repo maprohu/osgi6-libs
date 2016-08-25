@@ -21,7 +21,7 @@ object H2GisUtil {
     basicDataSource.setDriverClassLoader(getClass.getClassLoader)
     basicDataSource.setDriverClassName(classOf[Driver].getName)
     basicDataSource.setPoolPreparedStatements(false)
-    basicDataSource.setUrl("jdbc:h2:" + dbFile.toURI.toURL.toExternalForm.replaceAllLiterally("\\", "/"))
+    basicDataSource.setUrl("jdbc:h2:" + dbFile.toURI.toURL.toExternalForm.replaceAllLiterally("\\", "/") + ";DATABASE_TO_UPPER=false")
     //    basicDataSource.setUrl("jdbc:h2:" + dbFile.toURI.toURL.toExternalForm.replaceAllLiterally("\\", "/") + ";AUTO_SERVER=TRUE")
 
     if (isNew) {
