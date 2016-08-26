@@ -12,4 +12,24 @@ object HttpTools {
   }
 
 
+  def cleanScalaThreadLocals(path: String, req: HttpServletRequest, res: HttpServletResponse) : Boolean = {
+    if (req.getRequestURI == path) {
+      res.setContentType("text/plain")
+      res.setStatus(HttpServletResponse.SC_OK)
+      try {
+        val out = res.getWriter
+
+        out.println(Thread.currentThread().getName)
+        new Exception().printStackTrace(out)
+        out.println(ScalaThreadLocalCleaner.cleanScalaThreadLocals)
+      } catch {
+        case ex : Throwable =>
+          res.getWriter.println(s"Error cleaning: ${ex}")
+      }
+      true
+    } else {
+      false
+    }
+  }
+
 }
