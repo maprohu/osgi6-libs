@@ -67,8 +67,9 @@ object OsgiTools {
     }
   }
 
-  def execBundle(ctx: BundleContext, stream: InputStream, out: OutputStream) : Unit = {
+  def execBundle(ctxSelf: BundleContext, stream: InputStream, out: OutputStream) : Unit = {
     try {
+      val ctx = ctxSelf.getBundle(0).getBundleContext
       val bundle = installBundle0(ctx, stream)
       try {
         bundle.start()
