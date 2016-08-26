@@ -11,11 +11,17 @@ object ScalaThreadLocalCleaner {
 
   case class CleanResult(
     cleaned: Seq[String],
+    suspicious: Seq[String],
     retained: Seq[String]
   )
 
+  val leakingClassNames = Set(
+    "scala.concurrent.forkjoin.ForkJoinPool$Submitter",
+    classOf[ThreadLocalRandom].getName
+  )
+
   def shouldClean(value: Any) : Boolean = {
-    value.getClass.getName == classOf[ThreadLocalRandom].getName
+    leakingClassNames.contains(value.getClass.getName)
   }
 
   def cleanScalaThreadLocals : CleanResult = {
@@ -31,7 +37,7 @@ object ScalaThreadLocalCleaner {
     val table: Any = tableField.get(threadLocalsField.get(thread))
     val threadLocalCount: Int = java.lang.reflect.Array.getLength(table)
 
-    (0 until threadLocalCount).foldLeft(CleanResult(Seq(),Seq()))({ (acc, index) =>
+    (0 until threadLocalCount).foldLeft(CleanResult(Seq(),Seq(), Seq()))({ (acc, index) =>
       val entry: Any = java.lang.reflect.Array.get(table, index)
       if (entry != null) {
         val valueField: Field = entry.getClass.getDeclaredField("value")
@@ -43,6 +49,8 @@ object ScalaThreadLocalCleaner {
           if (shouldClean(value)) {
             valueField.set(entry, null)
             acc.copy(cleaned = acc.cleaned :+ valueClassName)
+          } else if (valueClassName.startsWith("scala.")) {
+            acc.copy(suspicious = acc.suspicious :+ valueClassName)
           } else {
             acc.copy(retained = acc.retained :+ valueClassName)
           }
