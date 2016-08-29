@@ -5,7 +5,7 @@
     <parent>
         <groupId>osgi6</groupId>
         <artifactId>osgi6-libs</artifactId>
-        <version>1.0.12-SNAPSHOT</version>
+        <version>1.0.12</version>
     </parent>
     <artifactId>osgi6-actor</artifactId>
     <packaging>jar</packaging>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>osgi6</groupId>
             <artifactId>osgi6-common</artifactId>
-            <version>1.0.12-SNAPSHOT</version>
+            <version>1.0.12</version>
         </dependency>
         <dependency>
             <groupId>maprohu</groupId>
