@@ -73,7 +73,11 @@ object OsgiTools {
       val bundle = installBundle0(ctx, stream)
       try {
         bundle.start()
-        val implClass = bundle.loadClass(OsgiAdmin.AdminClassName)
+        val implPackageName =
+          bundle.getSymbolicName.replace('-', '.')
+        val implClassName =
+          s"${implPackageName}.${OsgiAdmin.AdminClassSimpleName}"
+        val implClass = bundle.loadClass(implClassName)
         val adminMethod = implClass.getMethod(OsgiAdmin.AdminMethodName, OsgiAdmin.AdminMethodParameters:_*)
         val instance = implClass.newInstance()
         adminMethod.invoke(instance, bundle.getBundleContext, out)

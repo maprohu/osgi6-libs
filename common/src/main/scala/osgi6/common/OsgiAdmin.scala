@@ -13,6 +13,7 @@ import scala.util.control.NonFatal
   */
 object OsgiAdmin {
 
+  val AdminClassSimpleName = "AdminImpl"
   val AdminClassName = "osgi6.admin.impl.AdminImpl"
   val AdminMethodName = "execute"
   val AdminMethodParameters = Seq(classOf[BundleContext], classOf[OutputStream])
